@@ -23,6 +23,13 @@ router.get('/users/identity', async (req: Request, res: Response) => {
   const senderName = req.headers['x-sender-name'] as string;
   const senderChannel = req.headers['x-sender-channel'] as string;
 
+  console.log(`[USERS] Context: ${JSON.stringify({
+    channelId,
+    userId,
+    senderName,
+    senderChannel,
+  })}`);
+
   if (!channelId) {
     console.log('[USERS] Error: Channel ID is required');
     return res.status(400).json({ error: 'Channel ID is required' });
