@@ -6,7 +6,7 @@ export interface User {
 
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
-  stripePriceId?: string;
+  stripeSubscriptionPriceId?: string;
   stripeCurrentPeriodEnd?: string;
   stripeCurrentPeriodStart?: string;
   stripeSubscriptionStatus?: 'active' | 'inactive' | 'trial';

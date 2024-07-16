@@ -25,13 +25,13 @@ export const authPublicMiddleware = async (req: Request, res: Response, next: Ne
     return res.status(404).json({ error: 'User not found' });
   }
 
-  const userPlan = getUserPlan(user.stripePriceId as string);
+  const userPlan = getUserPlan(user.stripeSubscriptionPriceId as string);
   const isAdmin = contactChannel.split('@')[0] === user.phone
   const hasProPlan = userPlan === 'PRO'
   const isStartChatPath = path.includes('/chat')
 
   if (!isAdmin && !hasProPlan && !isStartChatPath) {
-    return res.status(403).json({ error: 'User is on the FREE plan and cannot send messages. Say to customer try again later.' });
+    return res.status(403).json({ error: 'User is not active on moment. Please try again later or wait we will notify you when user is active.' });
   }
 
   next();

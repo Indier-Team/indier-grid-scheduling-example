@@ -74,7 +74,7 @@ publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request,
         phone: owner.phone,
         email: owner.email,
 
-        plan: getUserPlan(owner.stripePriceId as string),
+        plan: getUserPlan(owner.stripeSubscriptionPriceId as string),
         services: await listUserServices(owner.id),
         availableHours: owner.availableHours,
         

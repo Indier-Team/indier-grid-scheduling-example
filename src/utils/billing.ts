@@ -111,7 +111,7 @@ export async function handleSubscriptionChange(subscription: Stripe.Subscription
   const updatedUser: User = {
     ...user,
     stripeSubscriptionId: subscription.id,
-    stripePriceId: subscription.items.data[0].price.id,
+    stripeSubscriptionPriceId: subscription.items.data[0].price.id,
     stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
     stripeCurrentPeriodStart: new Date(subscription.current_period_start * 1000).toISOString(),
     stripeSubscriptionStatus: subscription.status as 'active' | 'inactive' | 'trial',
