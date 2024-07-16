@@ -17,12 +17,16 @@ const router = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.post('/contacts', async (req: Request, res: Response) => {
-  const { name, phone } = req.body;
+  console.log('[CONTACTS] Starting new contact creation');
   
+  const { name, phone } = req.body;
+  console.log(`[CONTACTS] Received contact data - Name: ${name}, Phone: ${phone}`);
+
   const userId = req.headers['x-user-id'] as string;
   const phoneWithFallback = (phone || req.headers['x-channel']).split('@')[0];
 
   if (!name || !phoneWithFallback) {
+    console.log('[CONTACTS] Error: Missing required fields');
     return res.status(400).json({ error: 'Name and phone are required' });
   }
 
@@ -30,9 +34,14 @@ router.post('/contacts', async (req: Request, res: Response) => {
   const now = new Date().toISOString();
   const contact: Contact = { id, name, phone, userId, createdAt: now, updatedAt: now };
 
-  await kv.set(['contacts', userId, id], contact);
-
-  res.status(201).json(contact);
+  try {
+    await kv.set(['contacts', userId, id], contact);
+    console.log(`[CONTACTS] Contact created successfully - Id: ${contact.id}`);
+    res.status(201).json(contact);
+  } catch (error) {
+    console.error(`[CONTACTS] Error creating contact: ${error}`);
+    res.status(500).json({ error: 'Failed to create contact' });
+  }
 });
 
 /**
@@ -44,6 +53,8 @@ router.post('/contacts', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.get('/contacts', async (req: Request, res: Response) => {
+  console.log('[CONTACTS] Fetching all contacts');
+
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
 
@@ -58,6 +69,7 @@ router.get('/contacts', async (req: Request, res: Response) => {
     contacts.push(entry.value as Contact);
   }
 
+  console.log(`[CONTACTS] Total contacts fetched: ${contacts.length}`);
   res.json(contacts);
 });
 
@@ -70,6 +82,8 @@ router.get('/contacts', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.put('/contacts/:id', async (req: Request, res: Response) => {
+  console.log('[CONTACTS] Starting contact update');
+  
   const { id } = req.params;
   const { name, phone } = req.body;
 
@@ -83,6 +97,7 @@ router.put('/contacts/:id', async (req: Request, res: Response) => {
   const contact = await kv.get<Contact>(contactKey);
 
   if (!contact.value) {
+    console.log(`[CONTACTS] Contact not found - Id: ${id}`);
     return res.status(404).json({ error: 'Contact not found' });
   }
 
@@ -93,9 +108,14 @@ router.put('/contacts/:id', async (req: Request, res: Response) => {
     updatedAt: new Date().toISOString(),
   };
 
-  await kv.set(contactKey, updatedContact);
-
-  res.json(updatedContact);
+  try {
+    await kv.set(contactKey, updatedContact);
+    console.log(`[CONTACTS] Contact updated successfully - Id: ${updatedContact.id}`);
+    res.json(updatedContact);
+  } catch (error) {
+    console.error(`[CONTACTS] Error updating contact: ${error}`);
+    res.status(500).json({ error: 'Failed to update contact' });
+  }
 });
 
 /**
@@ -107,6 +127,8 @@ router.put('/contacts/:id', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.delete('/contacts/:id', async (req: Request, res: Response) => {
+  console.log('[CONTACTS] Starting contact deletion');
+  
   const { id } = req.params;
 
   const userId = req.headers['x-user-id'] as string;
@@ -119,12 +141,18 @@ router.delete('/contacts/:id', async (req: Request, res: Response) => {
   const contact = await kv.get<Contact>(contactKey);
 
   if (!contact.value) {
+    console.log(`[CONTACTS] Contact not found - Id: ${id}`);
     return res.status(404).json({ error: 'Contact not found' });
   }
 
-  await kv.delete(contactKey);
-
-  res.status(204).end();
+  try {
+    await kv.delete(contactKey);
+    console.log(`[CONTACTS] Contact deleted successfully - Id: ${contact.value.id}`);
+    res.status(204).end();
+  } catch (error) {
+    console.error(`[CONTACTS] Error deleting contact: ${error}`);
+    res.status(500).json({ error: 'Failed to delete contact' });
+  }
 });
 
 export const contactsRouter = router;

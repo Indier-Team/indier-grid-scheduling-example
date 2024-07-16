@@ -15,14 +15,19 @@ const router = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.post('/billing/checkout', async (req: Request, res: Response) => {
+  console.log('[BILLING] Starting checkout session creation');
+  
   const userId = req.headers['x-user-id'] as string;
-  const user = await getUserById(userId);
+  console.log(`[BILLING] Received user ID: ${userId}`);
 
+  const user = await getUserById(userId);
   if(!user) {
+    console.log('[BILLING] Error: User not found');
     return res.status(404).json({ error: 'User not found' });
   }
 
   const { url } = await createCheckoutSession(user);
+  console.log(`[BILLING] Checkout session created successfully - URL: ${url}`);
 
   res.json({ 
     hasSubscription: user.stripeSubscriptionId !== null,
@@ -39,15 +44,20 @@ router.post('/billing/checkout', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.get('/billing/manage', async (req: Request, res: Response) => {
+  console.log('[BILLING] Starting portal session creation');
+  
   const userId = req.headers['x-user-id'] as string;
-  const user = await getUserById(userId);
+  console.log(`[BILLING] Received user ID: ${userId}`);
 
+  const user = await getUserById(userId);
   if(!user) {
+    console.log('[BILLING] Error: User not found');
     return res.status(404).json({ error: 'User not found' });
   }
 
   const { url } = await createPortalSession(user);
-  
+  console.log(`[BILLING] Portal session created successfully - URL: ${url}`);
+
   res.json({ 
     hasSubscription: user.stripeSubscriptionId !== null,
     manageUrl: url,
@@ -63,19 +73,24 @@ router.get('/billing/manage', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.get('/billing/plan', async (req: Request, res: Response) => {
+  console.log('[BILLING] Fetching user plan');
+  
   const userId = req.headers['x-user-id'] as string;
-  const user = await getUserById(userId);
+  console.log(`[BILLING] Received user ID: ${userId}`);
 
+  const user = await getUserById(userId);
   if(!user) {
+    console.log('[BILLING] Error: User not found');
     return res.status(404).json({ error: 'User not found' });
   }
 
   const plan = await getUserPlan(user.stripePriceId as string);
-
   if(!plan) {
+    console.log('[BILLING] Error: Plan not found');
     return res.status(404).json({ error: 'Plan not found' });
   }
 
+  console.log(`[BILLING] Plan fetched successfully - Plan: ${plan}`);
   res.json({ 
     plan: plan,
     subscriptionStatus: user.stripeSubscriptionStatus,

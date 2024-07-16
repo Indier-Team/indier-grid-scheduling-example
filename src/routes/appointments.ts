@@ -18,12 +18,16 @@ const router = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.post('/appointments', async (req: Request, res: Response) => {
+  console.log('[APPOINTMENTS] Starting new appointment creation');
+  
   const { contactId, serviceIds, date, time } = req.body;
+  console.log(`[APPOINTMENTS] Received appointment data - ContactId: ${contactId}, ServiceIds: ${serviceIds}, Date: ${date}, Time: ${time}`);
   
   const owner = req.headers['x-channel'] as string;
   const userId = req.headers['x-user-id'] as string;
 
   if (!contactId || !serviceIds || !date || !time || !Array.isArray(serviceIds)) {
+    console.log('[APPOINTMENTS] Error: Missing required fields');
     return res.status(400).json({ error: 'ContactId, serviceIds (array), date, and time are required' });
   }
 
@@ -32,6 +36,7 @@ router.post('/appointments', async (req: Request, res: Response) => {
   for (const serviceId of serviceIds) {
     const service = await kv.get<Service>(['services', serviceId]);
     if (!service.value) {
+      console.log(`[APPOINTMENTS] Error: Service with id ${serviceId} not found`);
       return res.status(400).json({ error: `Service with id ${serviceId} not found` });
     }
     totalDuration += service.value.duration;
@@ -40,6 +45,7 @@ router.post('/appointments', async (req: Request, res: Response) => {
   // Check availability
   const isAvailable = await checkAvailability(owner, date, time, totalDuration);
   if (!isAvailable) {
+    console.log('[APPOINTMENTS] Error: The selected time slot is not available');
     return res.status(400).json({ error: 'The selected time slot is not available' });
   }
 
@@ -58,9 +64,14 @@ router.post('/appointments', async (req: Request, res: Response) => {
     updatedAt: now
   };
 
-  await kv.set(['appointments', owner, id], appointment);
-
-  res.status(201).json(appointment);
+  try {
+    await kv.set(['appointments', owner, id], appointment);
+    console.log(`[APPOINTMENTS] Appointment created successfully - Id: ${appointment.id}`);
+    res.status(201).json(appointment);
+  } catch (error) {
+    console.error(`[APPOINTMENTS] Error creating appointment: ${error}`);
+    res.status(500).json({ error: 'Failed to create appointment' });
+  }
 });
 
 /**
@@ -72,6 +83,8 @@ router.post('/appointments', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.get('/appointments', async (req: Request, res: Response) => {
+  console.log('[APPOINTMENTS] Fetching all appointments');
+
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
 
@@ -86,6 +99,7 @@ router.get('/appointments', async (req: Request, res: Response) => {
     appointments.push(entry.value as Appointment);
   }
 
+  console.log(`[APPOINTMENTS] Total appointments fetched: ${appointments.length}`);
   res.json(appointments);
 });
 
@@ -98,8 +112,11 @@ router.get('/appointments', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.put('/appointments/:id', async (req: Request, res: Response) => {
+  console.log('[APPOINTMENTS] Starting appointment update');
+  
   const { id } = req.params;
   const { contactId, serviceIds, date, time } = req.body;
+  console.log(`[APPOINTMENTS] Received appointment data - Id: ${id}, ContactId: ${contactId}, ServiceIds: ${serviceIds}, Date: ${date}, Time: ${time}`);
   
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
@@ -111,6 +128,7 @@ router.put('/appointments/:id', async (req: Request, res: Response) => {
   const appointment = await kv.get<Appointment>(appointmentKey);
 
   if (!appointment.value) {
+    console.log(`[APPOINTMENTS] Error: Appointment with id ${id} not found`);
     return res.status(404).json({ error: 'Appointment not found' });
   }
 
@@ -121,6 +139,7 @@ router.put('/appointments/:id', async (req: Request, res: Response) => {
     for (const serviceId of serviceIds) {
       const service = await kv.get<Service>(['services', serviceId]);
       if (!service.value) {
+        console.log(`[APPOINTMENTS] Error: Service with id ${serviceId} not found`);
         return res.status(400).json({ error: `Service with id ${serviceId} not found` });
       }
       totalDuration += service.value.duration;
@@ -131,6 +150,7 @@ router.put('/appointments/:id', async (req: Request, res: Response) => {
   if (date !== appointment.value.date || time !== appointment.value.time) {
     const isAvailable = await checkAvailability(channelId, date ?? appointment.value.date, time ?? appointment.value.time, totalDuration);
     if (!isAvailable) {
+      console.log('[APPOINTMENTS] Error: The selected time slot is not available');
       return res.status(400).json({ error: 'The selected time slot is not available' });
     }
   }
@@ -145,9 +165,14 @@ router.put('/appointments/:id', async (req: Request, res: Response) => {
     updatedAt: new Date().toISOString(),
   };
 
-  await kv.set(appointmentKey, updatedAppointment);
-
-  res.json(updatedAppointment);
+  try {
+    await kv.set(appointmentKey, updatedAppointment);
+    console.log(`[APPOINTMENTS] Appointment updated successfully - Id: ${updatedAppointment.id}`);
+    res.json(updatedAppointment);
+  } catch (error) {
+    console.error(`[APPOINTMENTS] Error updating appointment: ${error}`);
+    res.status(500).json({ error: 'Failed to update appointment' });
+  }
 });
 
 /**
@@ -159,6 +184,8 @@ router.put('/appointments/:id', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.delete('/appointments/:id', async (req: Request, res: Response) => {
+  console.log('[APPOINTMENTS] Starting appointment deletion');
+  
   const { id } = req.params;
 
   const userId = req.headers['x-user-id'] as string;
@@ -171,12 +198,18 @@ router.delete('/appointments/:id', async (req: Request, res: Response) => {
   const appointment = await kv.get<Appointment>(appointmentKey);
 
   if (!appointment.value) {
+    console.log(`[APPOINTMENTS] Error: Appointment with id ${id} not found`);
     return res.status(404).json({ error: 'Appointment not found' });
   }
 
-  await kv.delete(appointmentKey);
-
-  res.status(204).end();
+  try {
+    await kv.delete(appointmentKey);
+    console.log(`[APPOINTMENTS] Appointment deleted successfully - Id: ${appointment.value.id}`);
+    res.status(204).end();
+  } catch (error) {
+    console.error(`[APPOINTMENTS] Error deleting appointment: ${error}`);
+    res.status(500).json({ error: 'Failed to delete appointment' });
+  }
 });
 
 export const appointmentsRouter = router;

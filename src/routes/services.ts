@@ -16,18 +16,25 @@ const router = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.post('/services', async (req: Request, res: Response) => {
+  console.log('[SERVICES] Starting new service creation');
+  
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
 
   const userByChannel = await getUserByPhone(channelId);
   const isAdmin = userByChannel?.id === userId;
+  console.log(`[SERVICES] Verifying admin status - IsAdmin: ${isAdmin}`);
 
   if (!isAdmin) {
+    console.log('[SERVICES] Access denied - User is not an admin');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
   const { name, price, duration } = req.body;
+  console.log(`[SERVICES] Received service data - Name: ${name}, Price: ${price}, Duration: ${duration}`);
+
   if (!name || !price || !duration) {
+    console.log('[SERVICES] Error: Missing required fields');
     return res.status(400).json({ error: 'Name, price, and duration are required' });
   }
 
@@ -35,9 +42,14 @@ router.post('/services', async (req: Request, res: Response) => {
   const now = new Date().toISOString();
   const service: Service = { id, name, price, duration, createdAt: now, updatedAt: now, userId };
 
-  await kv.set(['services', id], service);
-
-  res.status(201).json(service);
+  try {
+    await kv.set(['services', id], service);
+    console.log(`[SERVICES] Service created successfully - Id: ${id}`);
+    res.status(201).json(service);
+  } catch (error) {
+    console.error(`[SERVICES] Error creating service: ${error}`);
+    res.status(500).json({ error: 'Failed to create service' });
+  }
 });
 
 /**
@@ -48,6 +60,8 @@ router.post('/services', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.get('/services', async (req: Request, res: Response) => {
+  console.log('[SERVICES] Fetching all services');
+
   const userId = req.headers['x-user-id'] as string;
 
   const services: Service[] = [];
@@ -57,6 +71,7 @@ router.get('/services', async (req: Request, res: Response) => {
     services.push(entry.value as Service);
   }
 
+  console.log(`[SERVICES] Total services fetched: ${services.length}`);
   res.json(services);
 });
 
@@ -68,6 +83,8 @@ router.get('/services', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.put('/services/:id', async (req: Request, res: Response) => {
+  console.log('[SERVICES] Starting service update');
+  
   const { id } = req.params;
   const { name, price, duration } = req.body;
 
@@ -76,14 +93,17 @@ router.put('/services/:id', async (req: Request, res: Response) => {
 
   const userByChannel = await getUserByPhone(channelId);
   const isAdmin = userByChannel?.id === userId;
+  console.log(`[SERVICES] Verifying admin status - IsAdmin: ${isAdmin}`);
 
   if (!isAdmin) {
+    console.log('[SERVICES] Access denied - User is not an admin');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
   const service = await kv.get<Service>(['services', id]);
 
   if (!service.value) {
+    console.log(`[SERVICES] Service not found - Id: ${id}`);
     return res.status(404).json({ error: 'Service not found' });
   }
 
@@ -95,9 +115,14 @@ router.put('/services/:id', async (req: Request, res: Response) => {
     updatedAt: new Date().toISOString(),
   };
 
-  await kv.set(['services', id], updatedService);
-
-  res.json(updatedService);
+  try {
+    await kv.set(['services', id], updatedService);
+    console.log(`[SERVICES] Service updated successfully - Id: ${id}`);
+    res.json(updatedService);
+  } catch (error) {
+    console.error(`[SERVICES] Error updating service: ${error}`);
+    res.status(500).json({ error: 'Failed to update service' });
+  }
 });
 
 /**
@@ -108,13 +133,17 @@ router.put('/services/:id', async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 router.delete('/services/:id', async (req: Request, res: Response) => {
+  console.log('[SERVICES] Starting service deletion');
+  
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
 
   const userByChannel = await getUserByPhone(channelId);
   const isAdmin = userByChannel?.id === userId;
+  console.log(`[SERVICES] Verifying admin status - IsAdmin: ${isAdmin}`);
 
   if (!isAdmin) {
+    console.log('[SERVICES] Access denied - User is not an admin');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
