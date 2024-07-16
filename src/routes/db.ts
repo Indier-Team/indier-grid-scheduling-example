@@ -23,11 +23,11 @@ dbRouter.get('/db/reset', async (_: Request, res: Response) => {
       services: kv.list<Service>({ prefix: ["services"] }),
     };
 
-    Object.keys(entries).forEach(async (key) => {
+    for (const key of Object.keys(entries)) {
       for await (const res of entries[key as keyof typeof entries]) {
         await kv.delete(res.key);
       }
-    });
+    }
 
     console.log('[RESET-KV] KV store reset successfully');
     res.send({ message: 'KV store reset successfully' });
@@ -67,11 +67,11 @@ dbRouter.get('/db/view', async (_: Request, res: Response) => {
       services: kv.list<Service>({ prefix: ["services"] }),
     };
 
-    Object.keys(entries).forEach(async (key) => {
+    for (const key of Object.keys(entries)) {
       for await (const res of entries[key as keyof typeof entries]) {
         data[key as keyof typeof data].push(res.value as any);
       }
-    });
+    }
 
     console.log('[DB-VIEW] KV store fetched successfully');
 
