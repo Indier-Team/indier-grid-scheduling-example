@@ -15,10 +15,21 @@ dbRouter.get('/reset-kv', async (req: Request, res: Response) => {
   console.log('[RESET-KV] Starting KV store reset');
 
   try {
-    const entries = kv.list({});
-    for await (const entry of entries) {
-      await kv.delete(entry.key);
+    const entries = Promise.all([
+      kv.get(["users"]),
+      kv.get(["appointments"]),
+      kv.get(["contacts"]),
+      kv.get(["services"]),
+    ])
+
+    for (const entry of await entries) {
+      if (entry.value) {
+        for (const key of Object.keys(entry.value)) {
+          await kv.delete([key]);
+        }
+      }
     }
+
     console.log('[RESET-KV] KV store reset successfully');
     res.send({ message: 'KV store reset successfully' });
   } catch (error) {
