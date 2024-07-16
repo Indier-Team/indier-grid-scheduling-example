@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { stripe } from "../config/stripe.ts";
 import { kv } from "../config/kv.ts";
 import { User } from "../types.ts";
-import { getUserById, getUserByStripeCustomerId } from './user.ts';
+import { getUserByStripeCustomerId } from './user.ts';
 
 /**
  * Checks if a customer is on the PRO or FREE plan based on the provided price ID.

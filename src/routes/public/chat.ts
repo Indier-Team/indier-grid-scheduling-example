@@ -52,7 +52,7 @@ publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request,
   if (!isAdmin) {
     contact = await upsertContact(userId, {
       name: senderName,
-      phone: senderChannel,
+      phone: senderChannel.split('@')[0],
     });
   }
 
