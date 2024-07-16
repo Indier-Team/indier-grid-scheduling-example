@@ -12,7 +12,7 @@ import { adminAvailableHoursRouter } from './src/routes/admin/available-hours.ts
 import { publicAppointmentRouter } from './src/routes/public/appointment.ts';
 import { publicChatRouter } from './src/routes/public/chat.ts';
 import { publicContactRouter } from './src/routes/public/contact.ts';
-import { errorHandler } from './src/middlewares/errorHandler.ts';
+import { errorHandler } from './src/middlewares/error-handler.ts';
 
 const app = express();
 

@@ -29,15 +29,11 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req: R
   console.log(`[WEBHOOK] Processing event type: ${event.type}`);
   switch (event.type) {
     case 'customer.subscription.deleted':
+    case 'customer.subscription.updated':
     case 'customer.subscription.created':
       console.log(`[WEBHOOK] Handling subscription change - ID: ${(event.data.object as Stripe.Subscription).id}`);
       await handleSubscriptionChange(event.data.object as Stripe.Subscription);
       console.log(`[WEBHOOK] Subscription was updated successfully`);
-      break;
-    case 'customer.updated':
-      console.log(`[WEBHOOK] Handling customer update - ID: ${(event.data.object as Stripe.Customer).id}`);
-      await updateUserFromStripeWebhook(event.data.object as Stripe.Customer);
-      console.log(`[WEBHOOK] Customer was updated successfully`);
       break;
     case 'customer.created':
       console.log(`[WEBHOOK] Handling customer creation - ID: ${(event.data.object as Stripe.Customer).id}`);
