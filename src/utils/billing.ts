@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { stripe } from "../config/stripe.ts";
 import { kv } from "../config/kv.ts";
 import { User } from "../types.ts";
-import { getUserById } from './user.ts';
+import { getUserById, getUserByStripeCustomerId } from './user.ts';
 
 /**
  * Checks if a customer is on the PRO or FREE plan based on the provided price ID.
@@ -96,15 +96,9 @@ export async function createPortalSession(user: User) {
  * @returns {Promise<void>} - A promise that resolves when the user data is updated.
  */
 export async function handleSubscriptionChange(subscription: Stripe.Subscription) {
-  const userId = subscription.metadata.userId;
-  if (!userId) {
-    console.error('No userId found in subscription metadata');
-    return;
-  }
-
-  const user = await getUserById(userId);
+  const user = await getUserByStripeCustomerId(subscription.customer as string);
   if (!user) {
-    console.error(`User not found for id: ${userId}`);
+    console.error('No userId found in subscription metadata');
     return;
   }
 
@@ -118,7 +112,7 @@ export async function handleSubscriptionChange(subscription: Stripe.Subscription
     updatedAt: new Date().toISOString(),
   };
 
-  await kv.set(['users', userId], updatedUser);
-  console.log(`Updated subscription for user ${userId}`);
+  await kv.set(['users', user.id], updatedUser);
+  console.log(`Updated subscription for user ${user.id}`);
 }
 
