@@ -15,7 +15,10 @@ dbRouter.get('/reset-kv', async (req: Request, res: Response) => {
   console.log('[RESET-KV] Starting KV store reset');
 
   try {
-    await kv.clear();
+    const entries = kv.list({});
+    for await (const entry of entries) {
+      await kv.delete(entry.key);
+    }
     console.log('[RESET-KV] KV store reset successfully');
     res.send({ message: 'KV store reset successfully' });
   } catch (error) {
