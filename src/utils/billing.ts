@@ -21,7 +21,7 @@ export function getUserPlan(priceId: string): 'PRO' | 'FREE' {
   } else if (priceId === freePriceId) {
     return 'FREE';
   } else {
-    throw new Error('Invalid price ID');
+    throw new Error('[BILLING] Invalid price ID');
   }
 }
 
@@ -67,7 +67,7 @@ export async function createCheckoutSession(user: User) {
     };
   } catch (error) {
     console.error(error);
-    throw new Error('Error creating checkout session');
+    throw new Error('[BILLING] Error creating checkout session');
   }
 }
 
@@ -98,7 +98,7 @@ export async function createPortalSession(user: User) {
 export async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   const user = await getUserByStripeCustomerId(subscription.customer as string);
   if (!user) {
-    console.error('No userId found in subscription metadata');
+    console.error('[BILLING] No userId found in subscription metadata');
     return;
   }
 
@@ -113,6 +113,6 @@ export async function handleSubscriptionChange(subscription: Stripe.Subscription
   };
 
   await kv.set(['users', user.id], updatedUser);
-  console.log(`Updated subscription for user ${user.id}`);
+  console.log(`[BILLING] Updated subscription for user ${user.id}`);
 }
 

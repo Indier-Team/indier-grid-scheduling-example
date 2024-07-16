@@ -26,13 +26,6 @@ publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request,
   const senderName = req.headers['x-sender-name'] as string;
   const senderChannel = req.headers['x-sender-channel'] as string;
 
-  console.log(`[PUBLIC_CHAT] Context: ${JSON.stringify({
-    channelId,
-    userId,
-    senderName,
-    senderChannel,
-  })}`);
-
   if (!channelId) {
     console.log('[PUBLIC_CHAT] Error: Channel ID is required');
     return res.status(400).json({ error: 'Channel ID is required' });
