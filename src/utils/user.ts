@@ -143,8 +143,8 @@ export async function upsertUserWithStripeCustomer(customer: Stripe.Customer): P
     stripeSubscriptionId: subscription.id,
     stripeSubscriptionStatus: subscription.status,
     stripeSubscriptionPriceId: subscription.items.data[0].price.id,
-    stripeSubscriptionCurrentPeriodStart: subscription.current_period_start,
-    stripeSubscriptionCurrentPeriodEnd: subscription.current_period_end,
+    stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+    stripeCurrentPeriodStart: new Date(subscription.current_period_start * 1000).toISOString(),
   });
 
   return newUser;
