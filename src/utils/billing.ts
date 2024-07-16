@@ -14,8 +14,8 @@ import { getUserById } from './user.ts';
  */
 export function getUserPlan(priceId: string): 'PRO' | 'FREE' {
   try {
-    const proPriceId = Deno.env.get("STRIPE_PRO_PRICE_ID") as string;
-    const freePriceId = Deno.env.get("STRIPE_FREE_PRICE_ID") as string;
+    const proPriceId = Deno.env.get("STRIPE_PRO_PLAN_PRICE_ID") as string;
+    const freePriceId = Deno.env.get("STRIPE_FREE_PLAN_PRICE_ID") as string;
 
     const plans: { [key: string]: 'PRO' | 'FREE' } = {
       [proPriceId]: 'PRO',
@@ -58,7 +58,7 @@ export async function createCheckoutSession(user: User) {
           items: [
             {
               id: subscription.data[0].id,
-              price: Deno.env.get("STRIPE_PRO_PRICE_ID") || "",
+              price: Deno.env.get("STRIPE_PRO_PLAN_PRICE_ID") || "",
               quantity: 1,
             },
           ],
