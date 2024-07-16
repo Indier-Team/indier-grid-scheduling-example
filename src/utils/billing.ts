@@ -57,7 +57,7 @@ export async function createCheckoutSession(user: User) {
           subscription: stripeSubscriptionId as string,
           items: [
             {
-              id: subscription.data[0].price.id,
+              id: subscription.data[0].id,
               price: Deno.env.get("STRIPE_PRO_PRICE_ID") || "",
               quantity: 1,
             },
