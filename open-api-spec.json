@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://indier-todo-scheduling.deno.dev",
+      "url": "https://agenda-ai.deno.dev/api/v1",
       "description": "Production server"
     }
   ],
@@ -528,6 +528,50 @@
           },
           "403": {
             "description": "Admin access required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/plan": {
+      "get": {
+        "operationId": "getUserPlan",
+        "summary": "Get the current subscription plan of the user",
+        "responses": {
+          "200": {
+            "description": "Current subscription plan retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "plan": {
+                      "type": "string"
+                    },
+                    "subscriptionStatus": {
+                      "type": "string"
+                    },
+                    "currentPeriodStart": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "stripeCurrentPeriodEnd": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User or plan not found",
             "content": {
               "application/json": {
                 "schema": {
