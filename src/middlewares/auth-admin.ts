@@ -11,10 +11,10 @@ import { getUserById } from '../utils/user.ts';
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 export const authAdminMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const channel = req.headers['x-channel'];
+  const contactChannel = req.headers['x-sender-channel'];
   const userId = req.headers['x-user-id'];
 
-  if (!channel && !userId) {
+  if (!contactChannel && !userId) {
     return res.status(400).json({ error: 'x-channel or x-user-id header is required' });
   }
 
@@ -23,7 +23,7 @@ export const authAdminMiddleware = async (req: Request, res: Response, next: Nex
     return res.status(404).json({ error: 'Account not found' });
   }
 
-  const isAdmin = channel !== account.phone
+  const isAdmin = contactChannel === account.phone
 
   if (!isAdmin) {
     return res.status(403).json({ error: 'You are not authorized to access this resource' });
