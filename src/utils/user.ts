@@ -14,7 +14,7 @@ import { defaultAvailableHours } from '../data/default-available-hours.ts';
  * @param {string} id - The ID of the user.
  * @returns {Promise<User | undefined>} - A promise that resolves to the user object or undefined if not found.
  */
-export async function getUserById(id: string): Promise<User | undefined> {
+export async function getUserById(id: string): Promise<User | null> {
   const user = await kv.get<User>(['users', id]);
   return user.value;
 }

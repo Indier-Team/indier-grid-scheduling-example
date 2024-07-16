@@ -2,6 +2,8 @@
   "tasks": {
     "vitest": "deno -A --node-modules-dir npm:vitest"
   },
+
+  "unstable": ["deno.kv"],
   "compilerOptions": {
     "allowJs": true,
     "lib": ["deno.window"],

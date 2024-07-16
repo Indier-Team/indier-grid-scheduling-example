@@ -10,8 +10,6 @@ import { authMiddleware } from './src/middlewares/auth.ts';
 import { errorHandler } from './src/middlewares/errorHandler.ts';
 import { webhook } from './src/routes/webhook.ts';
 import { contactsRouter } from './src/routes/contacts.ts';
-import { kv } from './src/config/kv.ts';
-import { Request, Response } from 'npm:@types/express@4.17.15';
 import { dbRouter } from './src/routes/db.ts';
 
 const app = express();

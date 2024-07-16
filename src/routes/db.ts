@@ -16,20 +16,18 @@ dbRouter.get('/db/reset', async (_: Request, res: Response) => {
   console.log('[RESET-KV] Starting KV store reset');
 
   try {
-    const entries = Promise.all([
-      kv.get(["users"]),
-      kv.get(["appointments"]),
-      kv.get(["contacts"]),
-      kv.get(["services"]),
-    ])
+    const entries = {
+      users: kv.list<User>({ prefix: ["users"] }),
+      appointments: kv.list<Appointment>({ prefix: ["appointments"] }),
+      contacts: kv.list<Contact>({ prefix: ["contacts"] }),
+      services: kv.list<Service>({ prefix: ["services"] }),
+    };
 
-    for (const entry of await entries) {
-      if (entry.value) {
-        for (const key of Object.keys(entry.value)) {
-          await kv.delete([key, entry.value[key].id]);
-        }
+    Object.keys(entries).forEach(async (key) => {
+      for await (const res of entries[key as keyof typeof entries]) {
+        await kv.delete(res.key);
       }
-    }
+    });
 
     console.log('[RESET-KV] KV store reset successfully');
     res.send({ message: 'KV store reset successfully' });
@@ -62,22 +60,18 @@ dbRouter.get('/db/view', async (_: Request, res: Response) => {
       services: [],
     }
 
-    const entries = await Promise.all([
-      kv.get<User>(["users"]),
-      kv.get<Appointment>(["appointments"]),
-      kv.get<Contact>(["contacts"]),
-      kv.get<Service>(["services"]),
-    ]);
+    const entries = {
+      users: kv.list<User>({ prefix: ["users"] }),
+      appointments: kv.list<Appointment>({ prefix: ["appointments"] }),
+      contacts: kv.list<Contact>({ prefix: ["contacts"] }),
+      services: kv.list<Service>({ prefix: ["services"] }),
+    };
 
-    for (const entry of entries) {
-      if (entry.value) {
-        const key = Object.keys(entry.value)[0];
-        if (key in data) {
-          // deno-lint-ignore no-explicit-any
-          (data[key as keyof typeof data] as any[]).push(entry.value[key]);
-        }
+    Object.keys(entries).forEach(async (key) => {
+      for await (const res of entries[key as keyof typeof entries]) {
+        data[key as keyof typeof data].push(res.value as any);
       }
-    }
+    });
 
     console.log('[DB-VIEW] KV store fetched successfully');
 
