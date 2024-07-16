@@ -7,6 +7,7 @@ import { adminRouter } from './src/routes/admin.ts';
 import { billingRouter } from './src/routes/billing.ts';
 import { authMiddleware } from './src/middlewares/auth.ts';
 import { errorHandler } from './src/middlewares/errorHandler.ts';
+import { webhook } from './src/routes/webhook.ts';
 
 const app = express();
 
@@ -14,6 +15,13 @@ const app = express();
  * Middleware to enable Cross-Origin Resource Sharing (CORS).
  */
 app.use(cors());
+
+/**
+ * Route for handling Stripe webhooks.
+ * @route /api/v1/webhook
+ */
+app.use('/api/v1', webhook);
+
 
 /**
  * Middleware to parse incoming JSON requests.

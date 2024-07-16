@@ -104,3 +104,64 @@ export async function createUserWithStripeCustomer(customer: Stripe.Customer): P
 
   return newUser;
 }
+
+
+/**
+ * Updates an existing user with the provided user data.
+ * 
+ * @async
+ * @function updateUser
+ * @param {string} userId - The ID of the user to update.
+ * @param {Partial<User>} userData - The user data to update.
+ * @returns {Promise<User>} - A promise that resolves to the updated user object.
+ * @throws {Error} - Throws an error if the user update process fails.
+ */
+export async function updateUser(userId: string, userData: Partial<User>): Promise<User> {
+  const user = await kv.get<User>(['users', userId]);
+
+  if (!user.value) {
+    throw new Error('User not found');
+  }
+
+  const updatedUser: User = {
+    ...user.value,
+    ...userData,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await kv.set(['users', userId], updatedUser);
+
+  return updatedUser;
+}
+
+/**
+ * Updates a user based on data received from a Stripe webhook event.
+ * 
+ * @async
+ * @function updateUserFromStripeWebhook
+ * @param {string} userId - The ID of the user to update.
+ * @param {object} stripeData - The data received from the Stripe webhook event.
+ * @returns {Promise<User>} - A promise that resolves to the updated user object.
+ * @throws {Error} - Throws an error if the user update process fails.
+ */
+export async function updateUserFromStripeWebhook(stripeData: Stripe.Customer): Promise<User> {
+  const user = await kv.get<User>(['users', stripeData.id]);
+
+  if (!user.value) {
+    throw new Error('User not found');
+  }
+
+  const updatedUser: User = {
+    id: user.value.id,
+    name: stripeData.name || user.value.name,
+    email: stripeData.email || user.value.email,
+    phone: stripeData.phone || user.value.phone,
+    stripeCustomerId: stripeData.id,
+    availableHours: user.value.availableHours,
+    createdAt: user.value.createdAt,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await kv.set(['users', user.value.id], updatedUser);
+  return updatedUser;
+}
