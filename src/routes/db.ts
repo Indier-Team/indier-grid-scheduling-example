@@ -26,7 +26,7 @@ dbRouter.get('/db/reset', async (_: Request, res: Response) => {
     for (const entry of await entries) {
       if (entry.value) {
         for (const key of Object.keys(entry.value)) {
-          await kv.delete([key]);
+          await kv.delete([key, entry.value[key].id]);
         }
       }
     }
