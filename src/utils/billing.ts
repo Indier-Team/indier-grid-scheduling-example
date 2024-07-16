@@ -6,6 +6,28 @@ import { User } from "../types.ts";
 import { getUserById } from './user.ts';
 
 /**
+ * Checks if a customer is on the PRO or FREE plan based on the provided price ID.
+ * 
+ * @param {string} priceId - The price ID to check.
+ * @returns {'PRO' | 'FREE'} - Returns 'PRO' if the customer is on the PRO plan, 'FREE' otherwise.
+ * @throws {Error} - Throws an error if the price check fails.
+ */
+export function getUserPlan(priceId: string): 'PRO' | 'FREE' {
+  try {
+    const proPriceId = Deno.env.get("STRIPE_PRO_PRICE_ID");
+    if (priceId === proPriceId) {
+      return 'PRO';
+    } else {
+      return 'FREE';
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Error checking customer plan');
+  }
+}
+
+
+/**
  * Creates a checkout session for a user to update their subscription.
  * 
  * @param {User} user - The user object containing stripeCustomerId and stripeSubscriptionId.

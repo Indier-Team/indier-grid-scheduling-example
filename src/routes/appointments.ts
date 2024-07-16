@@ -45,6 +45,7 @@ router.post('/appointments', async (req: Request, res: Response) => {
 
   const id = v1.generate() as string;
   const now = new Date().toISOString();
+  
   const appointment: Appointment = { 
     id, 
     contactId, 

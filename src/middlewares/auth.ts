@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "npm:express@4.18.2";
 import { getUserById } from '../utils/user.ts';
+import { getUserPlan } from '../utils/billing.ts';
 
 /**
  * Middleware to authenticate a user based on the 'x-channel' or 'x-user-id' headers.
@@ -21,6 +22,11 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   const user = await getUserById(userId as string);
   if (!user) {
     return res.status(404).json({ error: 'User not found' });
+  }
+
+  const userPlan = getUserPlan(user.stripePriceId as string);
+  if (userPlan === 'FREE' && channel === 'api') {
+    return res.status(403).json({ error: 'User is on the FREE plan and cannot send messages' });
   }
 
   next();
