@@ -13,19 +13,15 @@ import { getUserById } from './user.ts';
  * @throws {Error} - Throws an error if the price check fails.
  */
 export function getUserPlan(priceId: string): 'PRO' | 'FREE' {
-  try {
-    const proPriceId = Deno.env.get("STRIPE_PRO_PLAN_PRICE_ID") as string;
-    const freePriceId = Deno.env.get("STRIPE_FREE_PLAN_PRICE_ID") as string;
+  const proPriceId = Deno.env.get("STRIPE_PRO_PLAN_PRICE_ID") as string;
+  const freePriceId = Deno.env.get("STRIPE_FREE_PLAN_PRICE_ID") as string;
 
-    const plans: { [key: string]: 'PRO' | 'FREE' } = {
-      [proPriceId]: 'PRO',
-      [freePriceId]: 'FREE',
-    }
-    
-    return plans[priceId]
-  } catch (error) {
-    console.error(error);
-    throw new Error('Error checking customer plan');
+  if (priceId === proPriceId) {
+    return 'PRO';
+  } else if (priceId === freePriceId) {
+    return 'FREE';
+  } else {
+    throw new Error('Invalid price ID');
   }
 }
 
