@@ -100,6 +100,10 @@ app.use(errorHandler);
 app.listen(parseInt(Deno.env.get("PORT") || "3000"), () => {
   const port = parseInt(Deno.env.get("PORT") || "3000");
   console.log(`Server is running on port ${port}`);
+  console.log('-------------')
+  console.log(`Stripe PRO PLAN: ${Deno.env.get("STRIPE_PRO_PLAN_PRICE_ID")}`);
+  console.log(`Stripe FREE PLAN: ${Deno.env.get("STRIPE_FREE_PLAN_PRICE_ID")}`);
+  console.log('-------------')
 });
 
 export { app };
