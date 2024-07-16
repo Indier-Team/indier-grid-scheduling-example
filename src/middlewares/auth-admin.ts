@@ -24,6 +24,13 @@ export const authAdminMiddleware = async (req: Request, res: Response, next: Nex
   }
 
   const isAdmin = contactChannel.split('@')[0] === account.phone
+
+  console.log({
+    contactChannel,
+    account,
+    isAdmin
+  })
+
   if (!isAdmin) {
     return res.status(403).json({ error: 'You are not authorized to access this resource' });
   }
