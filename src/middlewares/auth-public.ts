@@ -26,7 +26,7 @@ export const authPublicMiddleware = async (req: Request, res: Response, next: Ne
   }
 
   const userPlan = getUserPlan(user.stripePriceId as string);
-  const isAdmin = channel !== user.phone
+  const isAdmin = channel.split('@')[0] !== user.phone
   const hasProPlan = userPlan === 'PRO'
   const isStartChatPath = path.includes('/chat')
 
