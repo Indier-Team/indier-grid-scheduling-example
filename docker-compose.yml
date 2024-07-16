@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - PORT=${PORT:-3000}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: deno run --watch --allow-net --allow-env main.ts
+    env_file:
+      - .env
+
+networks:
+  default:
+    driver: bridge

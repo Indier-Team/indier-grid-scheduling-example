@@ -1,0 +1,35 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# TypeScript
+*.tsbuildinfo
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor folders
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# Docker
+.dockerignore
+
+# Deno
+deno.lock
+
+# Adicione esta linha para ignorar o arquivo .env
+.env

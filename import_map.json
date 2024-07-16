@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "express": "npm:express@4.18.2",
+    "cors": "npm:cors@2.8.5",
+    "stripe": "npm:stripe@15.3.0",
+    "uuid": "npm:uuid@8.0.0",
+    "supertest": "npm:supertest@6.0.0",
+    "vitest": "npm:vitest@0.27.0"
+  }
+}
