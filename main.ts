@@ -87,6 +87,14 @@ app.use('/api/v1', publicChatRouter);
  */
 app.use('/api/v1', publicContactRouter);
 
+app.use((req, res, next) => {
+  console.log('Request - x-sender-channel:', req.headers['x-sender-channel']);
+  console.log('Request - x-sender-name:', req.headers['x-sender-name']);
+  console.log('Request - x-user-id:', req.headers['x-sender-name']);
+
+  next();
+});
+
 
 /**
  * Global error handling middleware.
