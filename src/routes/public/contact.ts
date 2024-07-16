@@ -15,7 +15,7 @@ const publicContactRouter = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 publicContactRouter.put('/public/contact', async (req: Request, res: Response) => {
-  console.log('[CONTACTS] Starting contact update');
+  console.log('[PUBLIC_CONTACT] Starting contact update');
   
   const { name, phone, email } = req.body;
 
@@ -26,7 +26,7 @@ publicContactRouter.put('/public/contact', async (req: Request, res: Response) =
   const contact = await getContactByChannel(userId, senderChannel);
 
   if (!contact) {
-    console.log(`[CONTACTS] Contact not found - UserId: ${userId}, ChannelId: ${senderChannel}`);
+    console.log(`[PUBLIC_CONTACT] Contact not found - UserId: ${userId}, ChannelId: ${senderChannel}`);
     return res.status(404).json({ error: 'Contact not found' });
   }
 
@@ -45,10 +45,10 @@ publicContactRouter.put('/public/contact', async (req: Request, res: Response) =
       email: updatedContact.email,
     });
     
-    console.log(`[CONTACTS] Contact updated successfully - Id: ${updatedContact.id}`);
+    console.log(`[PUBLIC_CONTACT] Contact updated successfully - Id: ${updatedContact.id}`);
     res.json(updatedContact);
   } catch (error) {
-    console.error(`[CONTACTS] Error updating contact: ${error}`);
+    console.error(`[PUBLIC_CONTACT] Error updating contact: ${error}`);
     res.status(500).json({ error: 'Failed to update contact' });
   }
 });

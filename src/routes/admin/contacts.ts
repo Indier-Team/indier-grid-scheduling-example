@@ -18,7 +18,7 @@ const adminContactsRouter = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 adminContactsRouter.get('/admin/contacts', authAdminMiddleware, async (req: Request, res: Response) => {
-  console.log('[CONTACTS] Fetching all contacts');
+  console.log('[ADMIN_CONTACTS] Fetching all contacts');
 
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
@@ -34,7 +34,7 @@ adminContactsRouter.get('/admin/contacts', authAdminMiddleware, async (req: Requ
     contacts.push(entry.value as Contact);
   }
 
-  console.log(`[CONTACTS] Total contacts fetched: ${contacts.length}`);
+  console.log(`[ADMIN_CONTACTS] Total contacts fetched: ${contacts.length}`);
   res.json(contacts);
 });
 
@@ -47,7 +47,7 @@ adminContactsRouter.get('/admin/contacts', authAdminMiddleware, async (req: Requ
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 adminContactsRouter.put('/admin/contacts', authAdminMiddleware, async (req: Request, res: Response) => {
-  console.log('[CONTACTS] Starting contact update');
+  console.log('[ADMIN_CONTACTS] Starting contact update');
   const { id, name, phone, email } = req.body;
 
   const userId = req.headers['x-user-id'] as string;
@@ -60,10 +60,10 @@ adminContactsRouter.put('/admin/contacts', authAdminMiddleware, async (req: Requ
       email: email
     });
 
-    console.log(`[CONTACTS] Contact updated successfully - Id: ${updatedContact.id}`);
+    console.log(`[ADMIN_CONTACTS] Contact updated successfully - Id: ${updatedContact.id}`);
     res.json(updatedContact);
   } catch (error) {
-    console.error(`[CONTACTS] Error updating contact: ${error}`);
+    console.error(`[ADMIN_CONTACTS] Error updating contact: ${error}`);
     res.status(500).json({ error: 'Failed to update contact' });
   }
 });
@@ -77,7 +77,7 @@ adminContactsRouter.put('/admin/contacts', authAdminMiddleware, async (req: Requ
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 adminContactsRouter.delete('/admin/contacts/:id', authAdminMiddleware, async (req: Request, res: Response) => {
-  console.log('[CONTACTS] Starting contact deletion');
+  console.log('[ADMIN_CONTACTS] Starting contact deletion');
   
   const { id } = req.params;
 
@@ -91,16 +91,16 @@ adminContactsRouter.delete('/admin/contacts/:id', authAdminMiddleware, async (re
   const contact = await kv.get<Contact>(contactKey);
 
   if (!contact.value) {
-    console.log(`[CONTACTS] Contact not found - Id: ${id}`);
+    console.log(`[ADMIN_CONTACTS] Contact not found - Id: ${id}`);
     return res.status(404).json({ error: 'Contact not found' });
   }
 
   try {
     await kv.delete(contactKey);
-    console.log(`[CONTACTS] Contact deleted successfully - Id: ${contact.value.id}`);
+    console.log(`[ADMIN_CONTACTS] Contact deleted successfully - Id: ${contact.value.id}`);
     res.status(204).end();
   } catch (error) {
-    console.error(`[CONTACTS] Error deleting contact: ${error}`);
+    console.error(`[ADMIN_CONTACTS] Error deleting contact: ${error}`);
     res.status(500).json({ error: 'Failed to delete contact' });
   }
 });

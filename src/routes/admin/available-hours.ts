@@ -16,7 +16,7 @@ const adminAvailableHoursRouter = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 adminAvailableHoursRouter.put('/admin/available-hours', authAdminMiddleware, async (req: Request, res: Response) => {
-  console.log('[USERS] Updating user available hours');
+  console.log('[ADMIN_AVAILABLE_HOURS] Updating user available hours');
   
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
@@ -25,21 +25,21 @@ adminAvailableHoursRouter.put('/admin/available-hours', authAdminMiddleware, asy
   const isAdmin = userByChannel?.id === userId;
 
   if (!isAdmin) {
-    console.log('[USERS] Error: Admin access required');
+    console.log('[ADMIN_AVAILABLE_HOURS] Error: Admin access required');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
   const { availableHours } = req.body;
 
   if (!availableHours || typeof availableHours !== 'object') {
-    console.log('[USERS] Error: Available hours are required and must be an object');
+    console.log('[ADMIN_AVAILABLE_HOURS] Error: Available hours are required and must be an object');
     return res.status(400).json({ error: 'Available hours are required and must be an object' });
   }
 
   const user = await kv.get<User>(['users', userId]);
 
   if (!user.value) {
-    console.log(`[USERS] Error: User not found - Id: ${userId}`);
+    console.log(`[ADMIN_AVAILABLE_HOURS] Error: User not found - Id: ${userId}`);
     return res.status(404).json({ error: 'User not found' });
   }
 
@@ -51,7 +51,7 @@ adminAvailableHoursRouter.put('/admin/available-hours', authAdminMiddleware, asy
 
   await kv.set(['users', userId], updatedUser);
 
-  console.log(`[USERS] Available hours updated successfully - User: ${updatedUser.name}`);
+  console.log(`[ADMIN_AVAILABLE_HOURS] Available hours updated successfully - User: ${updatedUser.name}`);
   res.json({ message: 'Available hours updated successfully', user: updatedUser });
 });
 

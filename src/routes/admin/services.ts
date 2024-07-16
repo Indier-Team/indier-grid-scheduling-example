@@ -71,14 +71,14 @@ adminServicesRouter.get('/admin/services', authAdminMiddleware, async (req: Requ
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 adminServicesRouter.put('/admin/services/:id', authAdminMiddleware, async (req: Request, res: Response) => {
-  console.log('[SERVICES] Starting service update');
+  console.log('[ADMIN_SERVICES] Starting service update');
   const { id } = req.params;
   const { name, price, duration } = req.body;
 
   const service = await kv.get<Service>(['services', id]);
 
   if (!service.value) {
-    console.log(`[SERVICES] Service not found - Id: ${id}`);
+    console.log(`[ADMIN_SERVICES] Service not found - Id: ${id}`);
     return res.status(404).json({ error: 'Service not found' });
   }
 
@@ -92,10 +92,10 @@ adminServicesRouter.put('/admin/services/:id', authAdminMiddleware, async (req: 
 
   try {
     await kv.set(['services', id], updatedService);
-    console.log(`[SERVICES] Service updated successfully - Id: ${id}`);
+    console.log(`[ADMIN_SERVICES] Service updated successfully - Id: ${id}`);
     res.json(updatedService);
   } catch (error) {
-    console.error(`[SERVICES] Error updating service: ${error}`);
+    console.error(`[ADMIN_SERVICES] Error updating service: ${error}`);
     res.status(500).json({ error: 'Failed to update service' });
   }
 });
@@ -108,16 +108,18 @@ adminServicesRouter.put('/admin/services/:id', authAdminMiddleware, async (req: 
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 adminServicesRouter.delete('/admin/services/:id', authAdminMiddleware, async (req: Request, res: Response) => {
-  console.log('[SERVICES] Starting service deletion');
+  console.log('[ADMIN_SERVICES] Starting service deletion');
   const { id } = req.params;
 
   const service = await kv.get<Service>(['services', id]);
 
   if (!service.value) {
+    console.log(`[ADMIN_SERVICES] Service not found - Id: ${id}`);
     return res.status(404).json({ error: 'Service not found' });
   }
 
   await kv.delete(['services', id]);
+  console.log(`[ADMIN_SERVICES] Service deleted successfully - Id: ${id}`);
   res.status(204).end();
 });
 

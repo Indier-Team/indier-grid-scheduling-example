@@ -16,39 +16,39 @@ const adminReportRouter = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 adminReportRouter.get('/admin/reports', authAdminMiddleware, async (req: Request, res: Response) => {
-  console.log('[ADMIN] Starting report generation');
+  console.log('[ADMIN_REPORT] Starting report generation');
   
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
-  console.log(`[ADMIN] Request received - UserId: ${userId}, ChannelId: ${channelId}`);
+  console.log(`[ADMIN_REPORT] Request received - UserId: ${userId}, ChannelId: ${channelId}`);
 
   // Verify admin status
   const userByChannel = await getUserByPhone(channelId);
   const isAdmin = userByChannel?.id === userId;
-  console.log(`[ADMIN] Admin verification - IsAdmin: ${isAdmin}`);
+  console.log(`[ADMIN_REPORT] Admin verification - IsAdmin: ${isAdmin}`);
 
   if (!isAdmin) {
-    console.log('[ADMIN] Access denied - User is not an admin');
+    console.log('[ADMIN_REPORT] Access denied - User is not an admin');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
   // Extract and validate date parameters
   const { startDate, endDate } = req.query;
-  console.log(`[ADMIN] Date parameters received - StartDate: ${startDate}, EndDate: ${endDate}`);
+  console.log(`[ADMIN_REPORT] Date parameters received - StartDate: ${startDate}, EndDate: ${endDate}`);
 
   if (!startDate || !endDate) {
-    console.log('[ADMIN] Error: Start and end dates not provided');
+    console.log('[ADMIN_REPORT] Error: Start and end dates not provided');
     return res.status(400).json({ error: 'Start date and end date are required' });
   }
 
   const start = new Date(startDate as string);
   const end = new Date(endDate as string);
-  console.log(`[ADMIN] Processed date range - Start: ${start}, End: ${end}`);
+  console.log(`[ADMIN_REPORT] Processed date range - Start: ${start}, End: ${end}`);
 
   // Fetch and filter appointments
   const appointments: Appointment[] = [];
   const records = kv.list({ prefix: ['appointments'] });
-  console.log('[ADMIN] Starting appointment search');
+  console.log('[ADMIN_REPORT] Starting appointment search');
 
   for await (const entry of records) {
     const appointment = entry.value as Appointment;
@@ -57,14 +57,14 @@ adminReportRouter.get('/admin/reports', authAdminMiddleware, async (req: Request
       appointments.push(appointment);
     }
   }
-  console.log(`[ADMIN] Total appointments found: ${appointments.length}`);
+  console.log(`[ADMIN_REPORT] Total appointments found: ${appointments.length}`);
 
   // Calculate report statistics
   const totalAppointments = appointments.length;
   const totalDuration = appointments.reduce((sum, app) => sum + app.duration, 0);
   const uniqueContacts = new Set(appointments.map(app => app.contactId)).size;
 
-  console.log(`[ADMIN] Statistics calculated - Total: ${totalAppointments}, Duration: ${totalDuration}, Unique contacts: ${uniqueContacts}`);
+  console.log(`[ADMIN_REPORT] Statistics calculated - Total: ${totalAppointments}, Duration: ${totalDuration}, Unique contacts: ${uniqueContacts}`);
 
   // Prepare and send the report
   const report = {
@@ -74,7 +74,7 @@ adminReportRouter.get('/admin/reports', authAdminMiddleware, async (req: Request
     appointments,
   };
 
-  console.log('[ADMIN] Report generated successfully');
+  console.log('[ADMIN_REPORT] Report generated successfully');
   res.json(report);
 });
 

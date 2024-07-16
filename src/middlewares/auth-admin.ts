@@ -14,26 +14,27 @@ export const authAdminMiddleware = async (req: Request, res: Response, next: Nex
   const contactChannel = req.headers['x-sender-channel'];
   const userId = req.headers['x-user-id'];
 
+  console.log('authAdminMiddleware called');
+
   if (!contactChannel && !userId) {
+    console.log('Missing x-channel or x-user-id header');
     return res.status(400).json({ error: 'x-channel or x-user-id header is required' });
   }
 
   const account = await getUserById(userId as string);
   if (!account) {
+    console.log('Account not found for userId:', userId);
     return res.status(404).json({ error: 'Account not found' });
   }
 
-  const isAdmin = contactChannel.split('@')[0] === account.phone
-
-  console.log({
-    contactChannel,
-    account,
-    isAdmin
-  })
+  const isAdmin = contactChannel.split('@')[0] === account.phone;
+  console.log('isAdmin:', isAdmin);
 
   if (!isAdmin) {
+    console.log('Unauthorized access attempt by userId:', userId);
     return res.status(403).json({ error: 'You are not authorized to access this resource' });
   }
 
+  console.log('User authorized:', userId);
   next();
 };

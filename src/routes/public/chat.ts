@@ -19,14 +19,14 @@ const publicChatRouter = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request, res: Response) => {
-  console.log('[CHAT] Verifying user identity');
+  console.log('[PUBLIC_CHAT] Verifying user identity');
   
   const channelId = req.headers['x-channel'] as string;
   const userId = req.headers['x-user-id'] as string;
   const senderName = req.headers['x-sender-name'] as string;
   const senderChannel = req.headers['x-sender-channel'] as string;
 
-  console.log(`[CHAT] Context: ${JSON.stringify({
+  console.log(`[PUBLIC_CHAT] Context: ${JSON.stringify({
     channelId,
     userId,
     senderName,
@@ -34,13 +34,13 @@ publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request,
   })}`);
 
   if (!channelId) {
-    console.log('[CHAT] Error: Channel ID is required');
+    console.log('[PUBLIC_CHAT] Error: Channel ID is required');
     return res.status(400).json({ error: 'Channel ID is required' });
   }
 
   const owner = await getUserById(userId);
   if(!owner) {
-    console.log('[CHAT] Error: This account is invalid. Dont try start chat with this account.');
+    console.log('[PUBLIC_CHAT] Error: This account is invalid. Dont try start chat with this account.');
     return res.status(404).json({ error: 'This account is invalid. Dont try start chat with this account.' });
   }
 
@@ -56,7 +56,7 @@ publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request,
     });
   }
 
-  console.log(`[CHAT] Chat started - ${userByChannel?.name || contact?.id} ON (${owner?.name} - ${owner?.phone})`);
+  console.log(`[PUBLIC_CHAT] Chat started - ${userByChannel?.name || contact?.id} ON (${owner?.name} - ${owner?.phone})`);
   res.json({ 
     message: 'Chat started', 
     data: {
