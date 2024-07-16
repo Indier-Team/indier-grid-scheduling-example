@@ -9,5 +9,5 @@ import Stripe from "npm:stripe@12.18.0";
  * @param {string} options.apiVersion - The version of the Stripe API to use.
  */
 export const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-  apiVersion: '2022-11-15',
+  apiVersion: '2024-04-10',
 });

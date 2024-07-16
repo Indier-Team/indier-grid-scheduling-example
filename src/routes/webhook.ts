@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-case-declarations
 import express from 'express';
 import Stripe from 'stripe';
 
