@@ -9,12 +9,12 @@ const publicContactRouter = express.Router();
 /**
  * Update current customer's contact.
  * 
- * @route PUT /public/contacts
+ * @route PUT /public/contact
  * @param {Request} req - The request object from Express.
  * @param {Response} res - The response object from Express.
  * @returns {Promise<void>} - A promise that resolves to void.
  */
-publicContactRouter.put('/contacts', async (req: Request, res: Response) => {
+publicContactRouter.put('/public/contact', async (req: Request, res: Response) => {
   console.log('[CONTACTS] Starting contact update');
   
   const { name, phone, email } = req.body;

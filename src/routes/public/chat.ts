@@ -18,7 +18,7 @@ const publicChatRouter = express.Router();
  * @param {Response} res - The response object from Express.
  * @returns {Promise<void>} - A promise that resolves to void.
  */
-publicChatRouter.post('/chat', authPublicMiddleware, async (req: Request, res: Response) => {
+publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request, res: Response) => {
   console.log('[CHAT] Verifying user identity');
   
   const channelId = req.headers['x-channel'] as string;
