@@ -14,12 +14,15 @@ import { getUserById } from './user.ts';
  */
 export function getUserPlan(priceId: string): 'PRO' | 'FREE' {
   try {
-    const proPriceId = Deno.env.get("STRIPE_PRO_PRICE_ID");
-    if (priceId === proPriceId) {
-      return 'PRO';
-    } else {
-      return 'FREE';
+    const proPriceId = Deno.env.get("STRIPE_PRO_PRICE_ID") as string;
+    const freePriceId = Deno.env.get("STRIPE_FREE_PRICE_ID") as string;
+
+    const plans: { [key: string]: 'PRO' | 'FREE' } = {
+      [proPriceId]: 'PRO',
+      [freePriceId]: 'FREE',
     }
+    
+    return plans[priceId]
   } catch (error) {
     console.error(error);
     throw new Error('Error checking customer plan');
