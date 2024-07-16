@@ -35,7 +35,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req: R
       console.log(`[WEBHOOK] Subscription was updated successfully`);
       break;
     case 'customer.updated':
-    case 'customer.created':
       console.log(`[WEBHOOK] Handling customer creation - ID: ${(event.data.object as Stripe.Customer).id}`);
       await upsertUserWithStripeCustomer(event.data.object as Stripe.Customer);
       console.log(`[WEBHOOK] Customer was created successfully`);
