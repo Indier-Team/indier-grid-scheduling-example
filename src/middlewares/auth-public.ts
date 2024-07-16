@@ -12,11 +12,11 @@ import { getUserPlan } from '../utils/billing.ts';
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 export const authPublicMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const channel = req.headers['x-channel'];
+  const contactChannel = req.headers['x-sender-channel'];
   const userId = req.headers['x-user-id'];
   const path = req.path;
 
-  if (!channel && !userId) {
+  if (!contactChannel && !userId) {
     return res.status(400).json({ error: 'x-channel or x-user-id header is required' });
   }
 
@@ -26,7 +26,7 @@ export const authPublicMiddleware = async (req: Request, res: Response, next: Ne
   }
 
   const userPlan = getUserPlan(user.stripePriceId as string);
-  const isAdmin = channel.split('@')[0] !== user.phone
+  const isAdmin = contactChannel.split('@')[0] === user.phone
   const hasProPlan = userPlan === 'PRO'
   const isStartChatPath = path.includes('/chat')
 
