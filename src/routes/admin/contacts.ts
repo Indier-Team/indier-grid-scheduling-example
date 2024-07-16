@@ -17,7 +17,7 @@ const adminContactsRouter = express.Router();
  * @param {Response} res - The response object from Express.
  * @returns {Promise<void>} - A promise that resolves to void.
  */
-adminContactsRouter.get('/contacts', authAdminMiddleware, async (req: Request, res: Response) => {
+adminContactsRouter.get('/admin/contacts', authAdminMiddleware, async (req: Request, res: Response) => {
   console.log('[CONTACTS] Fetching all contacts');
 
   const userId = req.headers['x-user-id'] as string;
