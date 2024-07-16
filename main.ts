@@ -11,6 +11,7 @@ import { errorHandler } from './src/middlewares/errorHandler.ts';
 import { webhook } from './src/routes/webhook.ts';
 import { contactsRouter } from './src/routes/contacts.ts';
 import { dbRouter } from './src/routes/db.ts';
+import { servicesRouter } from './src/routes/services.ts';
 
 const app = express();
 
@@ -73,7 +74,11 @@ app.use('/api/v1', billingRouter);
  */
 app.use('/api/v1', contactsRouter);
 
-
+/**
+ * Route for contacts operations.
+ * @route /api/v1/contacts
+ */
+app.use('/api/v1', servicesRouter);
 
 
 /**
