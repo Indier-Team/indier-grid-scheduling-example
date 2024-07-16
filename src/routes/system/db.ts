@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { kv } from '../config/kv.ts';
+import { kv } from '../../config/kv.ts';
 import { Request, Response } from 'express';
-import { Appointment, Contact, Service, User } from '../types.ts';
+import { Appointment, Contact, Service, User } from '../../types.ts';
 
 const dbRouter = Router();
 
@@ -12,7 +12,7 @@ const dbRouter = Router();
  * @returns {object} 200 - KV store reset successfully
  * @returns {Error}  500 - Failed to reset KV store
  */
-dbRouter.get('/db/reset', async (_: Request, res: Response) => {
+dbRouter.get('/system/db/reset', async (_: Request, res: Response) => {
   console.log('[RESET-KV] Starting KV store reset');
 
   try {
@@ -44,7 +44,7 @@ dbRouter.get('/db/reset', async (_: Request, res: Response) => {
  * @returns {object} 200 - KV store fetched successfully
  * @returns {Error}  500 - Failed to fetch KV store
  */
-dbRouter.get('/db/view', async (_: Request, res: Response) => {
+dbRouter.get('/system/db/view', async (_: Request, res: Response) => {
   console.log('[DB-VIEW] Starting KV store fetch');
 
   try {
@@ -69,6 +69,7 @@ dbRouter.get('/db/view', async (_: Request, res: Response) => {
 
     for (const key of Object.keys(entries)) {
       for await (const res of entries[key as keyof typeof entries]) {
+        // deno-lint-ignore no-explicit-any
         data[key as keyof typeof data].push(res.value as any);
       }
     }

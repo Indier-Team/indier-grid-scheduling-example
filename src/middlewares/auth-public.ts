@@ -11,9 +11,10 @@ import { getUserPlan } from '../utils/billing.ts';
  * 
  * @returns {Promise<void>} - A promise that resolves to void.
  */
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const authPublicMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const channel = req.headers['x-channel'];
   const userId = req.headers['x-user-id'];
+  const path = req.path;
 
   if (!channel && !userId) {
     return res.status(400).json({ error: 'x-channel or x-user-id header is required' });
@@ -25,8 +26,12 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   }
 
   const userPlan = getUserPlan(user.stripePriceId as string);
-  if (userPlan === 'FREE' && channel === 'api') {
-    return res.status(403).json({ error: 'User is on the FREE plan and cannot send messages' });
+  const isAdmin = channel !== user.phone
+  const hasProPlan = userPlan === 'PRO'
+  const isStartChatPath = path.includes('/chat')
+
+  if (!isAdmin && !hasProPlan && !isStartChatPath) {
+    return res.status(403).json({ error: 'User is on the FREE plan and cannot send messages. Say to customer try again later.' });
   }
 
   next();

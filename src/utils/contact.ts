@@ -9,6 +9,7 @@ import { v1 } from "https://deno.land/std@0.177.0/uuid/mod.ts";
  * @returns {Promise<Contact | null>} - A promise that resolves to the contact if found, otherwise null.
  */
 export async function getContactByChannel(userId: string, channelId: string): Promise<Contact | null> {
+  channelId = channelId.split('@')[0];
   const records = kv.list<Contact>({ prefix: ['contacts', userId] });
   
   const contacts = [];
@@ -45,3 +46,33 @@ export async function upsertContact(userId: string, contactData: { name: string,
   return contact;
 }
 
+/**
+ * Lists all contacts for a given user.
+ * 
+ * @param {string} userId - The ID of the user whose contacts are to be listed.
+ * @returns {Promise<Contact[]>} - A promise that resolves to an array of contacts.
+ */
+export async function listUserContacts(userId: string): Promise<Contact[]> {
+  const records = kv.list<Contact>({ prefix: ['contacts', userId] });
+  
+  const contacts: Contact[] = [];
+  for await (const res of records) {
+    contacts.push(res.value as Contact);
+  }
+
+  return contacts;
+}
+
+/**
+ * Retrieves a contact by its ID for a given user.
+ * 
+ * @param {string} userId - The ID of the user to whom the contact belongs.
+ * @param {string} contactId - The ID of the contact to retrieve.
+ * @returns {Promise<Contact | null>} - A promise that resolves to the contact object if found, or null if not found.
+ */
+export async function getContactById(userId: string, contactId: string): Promise<Contact | null> {
+  const contactKey = ['contacts', userId, contactId];
+  const contact = await kv.get<Contact>(contactKey);
+
+  return contact.value || null;
+}

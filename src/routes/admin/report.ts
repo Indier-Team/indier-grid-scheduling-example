@@ -1,11 +1,12 @@
 import express from "express";
 
-import { kv } from "../config/kv.ts";
-import { Appointment } from "../types.ts";
-import { getUserByPhone } from "../utils/user.ts";
+import { kv } from "../../config/kv.ts";
+import { Appointment } from "../../types.ts";
+import { getUserByPhone } from "../../utils/user.ts";
 import { Request, Response } from 'npm:@types/express@4.17.15';
+import { authAdminMiddleware } from '../../middlewares/auth-admin.ts';
 
-const router = express.Router();
+const adminReportRouter = express.Router();
 
 /**
  * @route GET /admin/reports
@@ -14,7 +15,7 @@ const router = express.Router();
  * @param {Response} res - The response object from Express.
  * @returns {Promise<void>} - A promise that resolves to void.
  */
-router.get('/admin/reports', async (req: Request, res: Response) => {
+adminReportRouter.get('/admin/reports', authAdminMiddleware, async (req: Request, res: Response) => {
   console.log('[ADMIN] Starting report generation');
   
   const userId = req.headers['x-user-id'] as string;
@@ -77,4 +78,4 @@ router.get('/admin/reports', async (req: Request, res: Response) => {
   res.json(report);
 });
 
-export const adminRouter = router;
+export const adminRouter = adminReportRouter;

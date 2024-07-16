@@ -2,16 +2,17 @@
 import express from "express";
 import cors from "cors";
 
-import { usersRouter } from './src/routes/users.ts';
-import { appointmentsRouter } from './src/routes/appointments.ts';
-import { adminRouter } from './src/routes/admin.ts';
-import { billingRouter } from './src/routes/billing.ts';
-import { authMiddleware } from './src/middlewares/auth.ts';
-import { errorHandler } from './src/middlewares/errorHandler.ts';
 import { webhook } from './src/routes/webhook.ts';
-import { contactsRouter } from './src/routes/contacts.ts';
-import { dbRouter } from './src/routes/db.ts';
-import { servicesRouter } from './src/routes/services.ts';
+import { dbRouter } from './src/routes/system/db.ts';
+import { adminAppointmentRouter } from './src/routes/admin/appointment.ts';
+import { adminBillingRouter } from './src/routes/admin/billing.ts';
+import { adminContactsRouter } from './src/routes/admin/contacts.ts';
+import { adminServicesRouter } from './src/routes/admin/services.ts';
+import { adminAvailableHoursRouter } from './src/routes/admin/available-hours.ts';
+import { publicAppointmentRouter } from './src/routes/public/appointment.ts';
+import { publicChatRouter } from './src/routes/public/chat.ts';
+import { publicContactRouter } from './src/routes/public/contact.ts';
+import { errorHandler } from './src/middlewares/errorHandler.ts';
 
 const app = express();
 
@@ -39,46 +40,52 @@ app.use('/api/v1', dbRouter);
 app.use(express.json());
 
 /**
- * Middleware to authenticate requests.
- * Applies to all routes.
- */
-app.use(authMiddleware);
-
-/**
- * Route for user-related operations.
- * @route /api/v1/users
- */
-app.use('/api/v1', usersRouter);
-
-/**
  * Route for appointment-related operations.
- * @route /api/v1/appointments
+ * @route /api/v1/admin/appointments
  */
-app.use('/api/v1', appointmentsRouter);
-
-/**
- * Route for admin-related operations.
- * @route /api/v1/admin
- */
-app.use('/api/v1', adminRouter);
+app.use('/api/v1', adminAppointmentRouter);
 
 /**
  * Route for billing-related operations.
- * @route /api/v1/billing
+ * @route /api/v1/admin/billing
  */
-app.use('/api/v1', billingRouter);
+app.use('/api/v1', adminBillingRouter);
 
 /**
- * Route for contacts operations.
- * @route /api/v1/contacts
+ * Route for contacts-related operations.
+ * @route /api/v1/admin/contacts
  */
-app.use('/api/v1', contactsRouter);
+app.use('/api/v1', adminContactsRouter);
 
 /**
- * Route for contacts operations.
- * @route /api/v1/contacts
+ * Route for services-related operations.
+ * @route /api/v1/admin/services
  */
-app.use('/api/v1', servicesRouter);
+app.use('/api/v1', adminServicesRouter);
+
+/**
+ * Route for available-hours-related operations.
+ * @route /api/v1/admin/available-hours
+ */
+app.use('/api/v1', adminAvailableHoursRouter);
+
+/**
+ * Route for public appointment operations.
+ * @route /api/v1/public/appointment
+ */
+app.use('/api/v1', publicAppointmentRouter);
+
+/**
+ * Route for public chat operations.
+ * @route /api/v1/public/chat
+ */
+app.use('/api/v1', publicChatRouter);
+
+/**
+ * Route for public contact operations.
+ * @route /api/v1/public/contact
+ */
+app.use('/api/v1', publicContactRouter);
 
 
 /**
