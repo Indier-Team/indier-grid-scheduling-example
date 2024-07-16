@@ -9,7 +9,7 @@ import { v1 } from "https://deno.land/std@0.177.0/uuid/mod.ts";
  * @returns {Promise<Contact | null>} - A promise that resolves to the contact if found, otherwise null.
  */
 export async function getContactByChannel(userId: string, channelId: string): Promise<Contact | null> {
-  const contacts = await kv.list<Contact>({ prefix: ['contacts', userId] });
+  const contacts = await kv.list<Contact>(['contacts', userId]);
 
   for (const contact of contacts) {
     if (contact.value.phone === channelId && contact.value.userId === userId) {
