@@ -41,6 +41,26 @@ export async function getUserByPhone(phone: string): Promise<User | undefined> {
 }
 
 /**
+ * Retrieves a user by their Stripe customer ID.
+ * 
+ * @async
+ * @function getUserByStripeCustomerId
+ * @param {string} stripeCustomerId - The Stripe customer ID of the user.
+ * @returns {Promise<User | undefined>} - A promise that resolves to the user object or undefined if not found.
+ */
+export async function getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined> {
+  const users: User[] = [];
+  const records = kv.list({ prefix: ['users'] });
+
+  for await (const entry of records) {
+    users.push(entry.value as User);
+  }
+
+  return users.find(user => user.stripeCustomerId === stripeCustomerId);
+}
+
+
+/**
  * Retrieves a user by their email address.
  * 
  * @async
@@ -65,12 +85,27 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
  * and creates a subscription with the plan price ID 'free'.
  * 
  * @async
- * @function createUserWithStripeCustomer
+ * @function upsertUserWithStripeCustomer
  * @param {Stripe.Customer} customer - The Stripe customer object.
  * @returns {Promise<User>} - A promise that resolves to the created user object.
  * @throws {Error} - Throws an error if the user creation or subscription process fails.
  */
-export async function createUserWithStripeCustomer(customer: Stripe.Customer): Promise<User> {
+export async function upsertUserWithStripeCustomer(customer: Stripe.Customer): Promise<User> {
+  const userAlreadyExists = await getUserByStripeCustomerId(customer.id)
+  
+  if(userAlreadyExists?.id) {
+    const updatedUser: User = {
+      ...userAlreadyExists,
+      name: customer.name || userAlreadyExists.name,
+      email: customer.email || userAlreadyExists.email,
+      phone: customer.phone?.replace(/\D/g, '') || userAlreadyExists.phone,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await kv.set(['users', userAlreadyExists.id], updatedUser);
+    return updatedUser;
+  }
+
   const userId = v1.generate() as string;
   const now = new Date().toISOString();
 
@@ -80,12 +115,11 @@ export async function createUserWithStripeCustomer(customer: Stripe.Customer): P
     email: customer.email || '',
     phone: customer.phone?.replace(/\D/g, '') || '',
     stripeCustomerId: customer.id,
+
     availableHours: defaultAvailableHours,
     createdAt: now,
     updatedAt: now,
   };
-
-  await kv.set(['users', userId], newUser);
 
   // Update Stripe customer metadata with the user ID
   await stripe.customers.update(customer.id, {
@@ -95,13 +129,22 @@ export async function createUserWithStripeCustomer(customer: Stripe.Customer): P
   });
 
   // Create a subscription with the plan price ID 'free'
-  await stripe.subscriptions.create({
+  const subscription = await stripe.subscriptions.create({
     customer: customer.id,
     items: [
       {
         price: Deno.env.get("STRIPE_FREE_PLAN_PRICE_ID") || "",
       },
     ],
+  });
+
+  await kv.set(['users', userId], {
+    ...newUser,
+    stripeSubscriptionId: subscription.id,
+    stripeSubscriptionStatus: subscription.status,
+    stripeSubscriptionPriceId: subscription.items.data[0].price.id,
+    stripeSubscriptionCurrentPeriodStart: subscription.current_period_start,
+    stripeSubscriptionCurrentPeriodEnd: subscription.current_period_end,
   });
 
   return newUser;

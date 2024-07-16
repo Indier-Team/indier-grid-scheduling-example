@@ -4,8 +4,7 @@ import Stripe from 'stripe';
 import { Request, Response } from 'npm:@types/express@4.17.15';
 import { stripe } from '../config/stripe.ts';
 import { handleSubscriptionChange } from '../utils/billing.ts';
-import { createUserWithStripeCustomer } from '../utils/user.ts';
-import { updateUserFromStripeWebhook } from '../utils/user.ts';
+import { upsertUserWithStripeCustomer } from '../utils/user.ts';
 
 const router = express.Router();
 
@@ -35,9 +34,10 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req: R
       await handleSubscriptionChange(event.data.object as Stripe.Subscription);
       console.log(`[WEBHOOK] Subscription was updated successfully`);
       break;
+    case 'customer.updated':
     case 'customer.created':
       console.log(`[WEBHOOK] Handling customer creation - ID: ${(event.data.object as Stripe.Customer).id}`);
-      await createUserWithStripeCustomer(event.data.object as Stripe.Customer);
+      await upsertUserWithStripeCustomer(event.data.object as Stripe.Customer);
       console.log(`[WEBHOOK] Customer was created successfully`);
       break;
     default:
