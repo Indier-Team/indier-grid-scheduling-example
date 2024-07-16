@@ -12,7 +12,7 @@ const dbRouter = Router();
  * @returns {object} 200 - KV store reset successfully
  * @returns {Error}  500 - Failed to reset KV store
  */
-dbRouter.get('/db/reset', async (req: Request, res: Response) => {
+dbRouter.get('/db/reset', async (_: Request, res: Response) => {
   console.log('[RESET-KV] Starting KV store reset');
 
   try {
@@ -39,8 +39,15 @@ dbRouter.get('/db/reset', async (req: Request, res: Response) => {
   }
 });
 
-dbRouter.get('/db/view', async (req: Request, res: Response) => {
-  console.log('[RESET-KV] Starting KV store reset');
+/**
+ * Route to view the contents of the Deno KV store.
+ * @route GET /db/view
+ * @group Database - Operations related to the database
+ * @returns {object} 200 - KV store fetched successfully
+ * @returns {Error}  500 - Failed to fetch KV store
+ */
+dbRouter.get('/db/view', async (_: Request, res: Response) => {
+  console.log('[DB-VIEW] Starting KV store fetch');
 
   try {
     const data: {
@@ -55,20 +62,19 @@ dbRouter.get('/db/view', async (req: Request, res: Response) => {
       services: [],
     }
 
-    const entries = Promise.all([
+    const entries = await Promise.all([
       kv.get<User>(["users"]),
       kv.get<Appointment>(["appointments"]),
       kv.get<Contact>(["contacts"]),
       kv.get<Service>(["services"]),
-    ])
+    ]);
 
-    for (const entry of await entries) {
+    for (const entry of entries) {
       if (entry.value) {
-        for (const key of Object.keys(entry.value)) {
-          if (key in data) {
-            // deno-lint-ignore no-explicit-any
-            (data[key as keyof typeof data] as any[]).push(entry.value[key]);
-          }
+        const key = Object.keys(entry.value)[0];
+        if (key in data) {
+          // deno-lint-ignore no-explicit-any
+          (data[key as keyof typeof data] as any[]).push(entry.value[key]);
         }
       }
     }
