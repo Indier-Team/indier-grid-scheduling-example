@@ -41,6 +41,11 @@ app.use('/api/v1', dbRouter);
 app.use(express.json());
 
 /**
+ * Middleware to log request details.
+ */
+app.use(debugMiddleware);
+
+/**
  * Route for appointment-related operations.
  * @route /api/v1/admin/appointments
  */
@@ -87,11 +92,6 @@ app.use('/api/v1', publicChatRouter);
  * @route /api/v1/public/contact
  */
 app.use('/api/v1', publicContactRouter);
-
-/**
- * Middleware to log request details.
- */
-app.use(debugMiddleware);
 
 
 /**
