@@ -8,6 +8,7 @@ import { billingRouter } from './src/routes/billing.ts';
 import { authMiddleware } from './src/middlewares/auth.ts';
 import { errorHandler } from './src/middlewares/errorHandler.ts';
 import { webhook } from './src/routes/webhook.ts';
+import { contactsRouter } from './src/routes/contacts.ts';
 
 const app = express();
 
@@ -57,6 +58,12 @@ app.use('/api/v1', adminRouter);
  * @route /api/v1/billing
  */
 app.use('/api/v1', billingRouter);
+
+/**
+ * Route for contacts operations.
+ * @route /api/v1/contacts
+ */
+app.use('/api/v1', contactsRouter);
 
 /**
  * Global error handling middleware.
