@@ -13,6 +13,7 @@ import { publicAppointmentRouter } from './src/routes/public/appointment.ts';
 import { publicChatRouter } from './src/routes/public/chat.ts';
 import { publicContactRouter } from './src/routes/public/contact.ts';
 import { errorHandler } from './src/middlewares/error-handler.ts';
+import { debugMiddleware } from './src/middlewares/debug.ts';
 
 const app = express();
 
@@ -87,13 +88,10 @@ app.use('/api/v1', publicChatRouter);
  */
 app.use('/api/v1', publicContactRouter);
 
-app.use((req, res, next) => {
-  console.log('Request - x-sender-channel:', req.headers['x-sender-channel']);
-  console.log('Request - x-sender-name:', req.headers['x-sender-name']);
-  console.log('Request - x-user-id:', req.headers['x-sender-name']);
-
-  next();
-});
+/**
+ * Middleware to log request details.
+ */
+app.use(debugMiddleware);
 
 
 /**
