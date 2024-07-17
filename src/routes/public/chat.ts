@@ -61,7 +61,7 @@ publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request,
 
         appointments: !isAdmin ? await listContactAppointments(contact?.id as string) : [],
       },
-      account: {
+      tenant: {
         id: owner.id,
         name: owner.name,
         phone: owner.phone,
