@@ -8,11 +8,13 @@ import { Service } from "../types.ts";
  * @returns {Promise<Service[]>} - A promise that resolves to an array of services.
  */
 export async function listUserServices(userId: string): Promise<Service[]> {
-  const records = kv.list<Service>({ prefix: ['services', userId] });
+  const records = kv.list<Service>({ prefix: ['services'] });
   
   const services: Service[] = [];
   for await (const res of records) {
-    services.push(res.value as Service);
+    if(res.value?.userId === userId) {
+      services.push(res.value as Service);
+    }
   }
 
   return services;

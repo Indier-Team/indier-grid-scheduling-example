@@ -53,11 +53,13 @@ export async function upsertContact(userId: string, contactData: { id?: string, 
  * @returns {Promise<Contact[]>} - A promise that resolves to an array of contacts.
  */
 export async function listUserContacts(userId: string): Promise<Contact[]> {
-  const records = kv.list<Contact>({ prefix: ['contacts', userId] });
+  const records = kv.list<Contact>({ prefix: ['contacts'] });
   
   const contacts: Contact[] = [];
   for await (const res of records) {
-    contacts.push(res.value as Contact);
+    if(res.value?.userId === userId) {
+      contacts.push(res.value as Contact);
+    }
   }
 
   return contacts;

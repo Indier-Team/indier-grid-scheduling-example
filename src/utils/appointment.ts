@@ -11,16 +11,18 @@ import { Appointment } from "../types.ts";
  */
 export async function listUserAppointments(userId: string, startDate?: Date, endDate?: Date): Promise<Appointment[]> {
   const records = kv.list<Appointment>({ prefix: ['appointments'] });
-  const schedulings: Appointment[] = [];
+  const appointments: Appointment[] = [];
 
   for await (const res of records) {
-    const scheduling = res.value as Appointment;
-    if (startDate && new Date(scheduling.date) < startDate) continue;
-    if (endDate && new Date(scheduling.date) > endDate) continue;
-    schedulings.push(scheduling);
+    const appointment = res.value as Appointment;
+    if(appointment.userId === userId) {
+      if (startDate && new Date(appointment.date) < startDate) continue;
+      if (endDate && new Date(appointment.date) > endDate) continue;
+      appointments.push(appointment);
+    }
   }
 
-  return schedulings.filter((scheduling) => scheduling.userId === userId);
+  return appointments
 }
 
 /**
@@ -30,11 +32,14 @@ export async function listUserAppointments(userId: string, startDate?: Date, end
  * @returns {Promise<Appointment[]>} - A promise that resolves to an array of appointments.
  */
 export async function listContactAppointments(contactId: string): Promise<Appointment[]> {
-  const records = kv.list<Appointment>({ prefix: ['appointments', contactId] });
+  const records = kv.list<Appointment>({ prefix: ['appointments'] });
   
   const appointments: Appointment[] = [];
   for await (const res of records) {
-    appointments.push(res.value as Appointment);
+    const appointment = res.value as Appointment;
+    if(appointment.contactId === contactId) {
+      appointments.push(appointment);
+    }
   }
 
   return appointments;
