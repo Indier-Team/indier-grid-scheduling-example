@@ -49,7 +49,6 @@ adminAppointmentRouter.put('/admin/appointments/:id', authAdminMiddleware, async
   console.log(`[APPOINTMENTS] Received appointment data - Id: ${id}, ContactId: ${contactId}, ServiceIds: ${serviceIds}, Date: ${date}, Time: ${time}`);
   
   const userId = req.headers['x-user-id'] as string;
-
   const appointment = await kv.get<Appointment>(['appointments', userId, id]);
 
   if (!appointment.value) {
@@ -91,7 +90,7 @@ adminAppointmentRouter.put('/admin/appointments/:id', authAdminMiddleware, async
   };
 
   try {
-    await kv.set(appointmentKey, updatedAppointment);
+    await kv.set(['appointments', userId, id], updatedAppointment);
     console.log(`[APPOINTMENTS] Appointment updated successfully - Id: ${updatedAppointment.id}`);
     res.json(updatedAppointment);
   } catch (error) {

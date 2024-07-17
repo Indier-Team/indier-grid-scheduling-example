@@ -14,6 +14,7 @@ import { publicChatRouter } from './src/routes/public/chat.ts';
 import { publicContactRouter } from './src/routes/public/contact.ts';
 import { errorHandler } from './src/middlewares/error-handler.ts';
 import { debugMiddleware } from './src/middlewares/debug.ts';
+import { adminReportRouter } from './src/routes/admin/report.ts';
 
 const app = express();
 
@@ -74,6 +75,12 @@ app.use('/api/v1', adminServicesRouter);
  * @route /api/v1/admin/available-hours
  */
 app.use('/api/v1', adminAvailableHoursRouter);
+
+/**
+ * Route for report-related operations.
+ * @route /api/v1/admin/report
+ */
+app.use('/api/v1', adminReportRouter);
 
 /**
  * Route for public appointment operations.

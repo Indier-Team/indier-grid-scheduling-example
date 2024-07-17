@@ -78,4 +78,4 @@ adminReportRouter.get('/admin/reports', authAdminMiddleware, async (req: Request
   res.json(report);
 });
 
-export const adminRouter = adminReportRouter;
+export { adminReportRouter };
