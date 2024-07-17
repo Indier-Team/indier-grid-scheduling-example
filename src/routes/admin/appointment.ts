@@ -49,10 +49,8 @@ adminAppointmentRouter.put('/admin/appointments/:id', authAdminMiddleware, async
   console.log(`[APPOINTMENTS] Received appointment data - Id: ${id}, ContactId: ${contactId}, ServiceIds: ${serviceIds}, Date: ${date}, Time: ${time}`);
   
   const userId = req.headers['x-user-id'] as string;
-  const channelId = req.headers['x-channel'] as string;
 
-  const appointmentKey = ['appointments', userId, id];
-  const appointment = await kv.get<Appointment>(appointmentKey);
+  const appointment = await kv.get<Appointment>(['appointments', userId, id]);
 
   if (!appointment.value) {
     console.log(`[APPOINTMENTS] Error: Appointment with id ${id} not found`);
@@ -75,7 +73,7 @@ adminAppointmentRouter.put('/admin/appointments/:id', authAdminMiddleware, async
 
   // Check availability if the date or time is changed
   if (date !== appointment.value.date || time !== appointment.value.time) {
-    const isAvailable = await checkAvailability(channelId, date ?? appointment.value.date, time ?? appointment.value.time, totalDuration);
+    const isAvailable = await checkAvailability(userId, date ?? appointment.value.date, time ?? appointment.value.time, totalDuration);
     if (!isAvailable) {
       console.log('[APPOINTMENTS] Error: The selected time slot is not available');
       return res.status(400).json({ error: 'The selected time slot is not available' });

@@ -10,9 +10,9 @@ import { Appointment } from "../types.ts";
  * @returns {Promise<Scheduling[]>} - A promise that resolves to an array of schedulings.
  */
 export async function listUserAppointments(userId: string, startDate?: Date, endDate?: Date): Promise<Appointment[]> {
-  const records = kv.list<Appointment>({ prefix: ['schedulings', userId] });
-  
+  const records = kv.list<Appointment>({ prefix: ['appointments'] });
   const schedulings: Appointment[] = [];
+
   for await (const res of records) {
     const scheduling = res.value as Appointment;
     if (startDate && new Date(scheduling.date) < startDate) continue;
@@ -20,7 +20,7 @@ export async function listUserAppointments(userId: string, startDate?: Date, end
     schedulings.push(scheduling);
   }
 
-  return schedulings;
+  return schedulings.filter((scheduling) => scheduling.userId === userId);
 }
 
 /**

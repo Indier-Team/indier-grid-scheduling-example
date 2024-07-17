@@ -29,7 +29,7 @@ export async function getContactByChannel(userId: string, channelId: string): Pr
  * @throws {Error} - Throws an error if the upsert process fails.
  */
 
-export async function upsertContact(userId: string, contactData: { name: string, phone: string, email?: string }): Promise<Contact> {
+export async function upsertContact(userId: string, contactData: { id?: string, name: string, phone: string, email?: string }): Promise<Contact> {
   const existingContact = await getContactByChannel(userId, contactData.phone);
 
   const now = new Date().toISOString();

@@ -1,6 +1,6 @@
 import { kv } from "../config/kv.ts";
 import { Appointment } from "../types.ts";
-import { getUserByPhone } from './user.ts';
+import { getUserById } from './user.ts';
 
 /**
  * Checks the availability of a user for a given date, time, and duration.
@@ -13,8 +13,8 @@ import { getUserByPhone } from './user.ts';
  * @param {number} duration - The duration of the appointment in minutes.
  * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the time slot is available.
  */
-export async function checkAvailability(owner: string, date: string, time: string, duration: number): Promise<boolean> {
-  const user = await getUserByPhone(owner);
+export async function checkAvailability(userId: string, date: string, time: string, duration: number): Promise<boolean> {
+  const user = await getUserById(userId);
   if (!user) {
     return false;
   }
@@ -47,10 +47,12 @@ export async function checkAvailability(owner: string, date: string, time: strin
 
   // Check for conflicts with existing appointments
   const appointments: Appointment[] = [];
-  const records = kv.list({ prefix: ['appointments', owner] });
+  const records = kv.list<Appointment>({ prefix: ['appointments'] });
   
   for await (const entry of records) {
-    appointments.push(entry.value as Appointment);
+    if(entry.value?.userId === userId) {
+      appointments.push(entry.value as Appointment);
+    }
   }
 
   for (const appointment of appointments) {
