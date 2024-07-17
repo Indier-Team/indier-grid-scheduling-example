@@ -18,7 +18,7 @@
         "summary": "Start a chat",
         "parameters": [
           {
-            "name": "x-channel",
+            "name": "x-sender-channel",
             "in": "header",
             "required": true,
             "schema": {

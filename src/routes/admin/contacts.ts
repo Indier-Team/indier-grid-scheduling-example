@@ -21,7 +21,7 @@ adminContactsRouter.get('/admin/contacts', authAdminMiddleware, async (req: Requ
   console.log('[ADMIN_CONTACTS] Fetching all contacts');
 
   const userId = req.headers['x-user-id'] as string;
-  const channelId = req.headers['x-channel'] as string;
+  const channelId = req.headers['x-sender-channel'] as string;
 
   const userByChannel = await getUserByPhone(channelId);
   const isAdmin = userByChannel?.id === userId;
@@ -82,7 +82,7 @@ adminContactsRouter.delete('/admin/contacts/:id', authAdminMiddleware, async (re
   const { id } = req.params;
 
   const userId = req.headers['x-user-id'] as string;
-  const channelId = req.headers['x-channel'] as string;
+  const channelId = req.headers['x-sender-channel'] as string;
 
   const userByChannel = await getUserByPhone(channelId);
   const isAdmin = userByChannel?.id === userId;

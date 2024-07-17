@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "npm:express@4.18.2";
 import { getUserById } from '../utils/user.ts';
 
 /**
- * Middleware to authenticate admin user based on the 'x-channel' or 'x-user-id' headers.
+ * Middleware to authenticate admin user based on the 'x-sender-channel' or 'x-user-id' headers.
  * 
  * @param {Request} req - The request object from Express.
  * @param {Response} res - The response object from Express.
@@ -17,8 +17,8 @@ export const authAdminMiddleware = async (req: Request, res: Response, next: Nex
   console.log('[AUTH_ADMIN_MIDDLEWARE]: AuthAdminMiddleware called');
 
   if (!contactChannel && !userId) {
-    console.log('[AUTH_ADMIN_MIDDLEWARE]: Missing x-channel or x-user-id header');
-    return res.status(400).json({ error: 'x-channel or x-user-id header is required' });
+    console.log('[AUTH_ADMIN_MIDDLEWARE]: Missing x-sender-channel or x-user-id header');
+    return res.status(400).json({ error: 'x-sender-channel or x-user-id header is required' });
   }
 
   const account = await getUserById(userId as string);

@@ -17,17 +17,7 @@ const adminAvailableHoursRouter = express.Router();
  */
 adminAvailableHoursRouter.put('/admin/available-hours', authAdminMiddleware, async (req: Request, res: Response) => {
   console.log('[ADMIN_AVAILABLE_HOURS] Updating user available hours');
-  
   const userId = req.headers['x-user-id'] as string;
-  const channelId = req.headers['x-channel'] as string;
-
-  const userByChannel = await getUserByPhone(channelId);
-  const isAdmin = userByChannel?.id === userId;
-
-  if (!isAdmin) {
-    console.log('[ADMIN_AVAILABLE_HOURS] Error: Admin access required');
-    return res.status(403).json({ error: 'Admin access required' });
-  }
 
   const { availableHours } = req.body;
 

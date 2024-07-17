@@ -3,7 +3,7 @@ import { getUserById } from '../utils/user.ts';
 import { getUserPlan } from '../utils/billing.ts';
 
 /**
- * Middleware to authenticate a user based on the 'x-channel' or 'x-user-id' headers.
+ * Middleware to authenticate a user based on the 'x-sender-channel' or 'x-user-id' headers.
  * 
  * @param {Request} req - The request object from Express.
  * @param {Response} res - The response object from Express.
@@ -17,7 +17,7 @@ export const authPublicMiddleware = async (req: Request, res: Response, next: Ne
   const path = req.path;
 
   if (!contactChannel && !userId) {
-    return res.status(400).json({ error: 'x-channel or x-user-id header is required' });
+    return res.status(400).json({ error: 'x-sender-channel or x-user-id header is required' });
   }
 
   const user = await getUserById(userId as string);

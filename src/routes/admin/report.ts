@@ -18,7 +18,7 @@ adminReportRouter.get('/admin/reports', authAdminMiddleware, async (req: Request
   console.log('[ADMIN_REPORT] Starting report generation');
   
   const userId = req.headers['x-user-id'] as string;
-  const channelId = req.headers['x-channel'] as string;
+  const channelId = req.headers['x-sender-channel'] as string;
   console.log(`[ADMIN_REPORT] Request received - UserId: ${userId}, ChannelId: ${channelId}`);
 
   // Extract and validate date parameters
