@@ -21,12 +21,11 @@ const publicChatRouter = express.Router();
 publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request, res: Response) => {
   console.log('[PUBLIC_CHAT] Verifying user identity');
   
-  const channelId = req.headers['x-channel'] as string;
   const userId = req.headers['x-user-id'] as string;
   const senderName = req.headers['x-sender-name'] as string;
   const senderChannel = req.headers['x-sender-channel'] as string;
 
-  if (!channelId) {
+  if (!senderChannel) {
     console.log('[PUBLIC_CHAT] Error: Channel ID is required');
     return res.status(400).json({ error: 'Channel ID is required' });
   }
@@ -37,8 +36,8 @@ publicChatRouter.post('/public/chat', authPublicMiddleware, async (req: Request,
     return res.status(404).json({ error: 'This account is invalid. Dont try start chat with this account.' });
   }
 
-  const userByChannel = await getUserByPhone(channelId);
-  const isAdmin = owner?.id === userId;
+  const userByChannel = await getUserByPhone(senderChannel.split('@')[0]);
+  const isAdmin = owner?.phone === senderChannel.split('@')[0];
 
   let contact: Contact | null = null;
 
