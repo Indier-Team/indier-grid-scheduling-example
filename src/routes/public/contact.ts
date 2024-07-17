@@ -15,7 +15,7 @@ const publicContactRouter = express.Router();
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 publicContactRouter.put('/public/contact', async (req: Request, res: Response) => {
-  console.log('[PUBLIC_CONTACT] Starting contact update');
+  console.log('[PUBLIC_CONTACT] Starting contact update 1');
   
   const { name, phone, email } = req.body;
 
