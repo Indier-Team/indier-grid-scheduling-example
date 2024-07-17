@@ -2,7 +2,6 @@ import express from "express";
 
 import { kv } from "../../config/kv.ts";
 import { Appointment } from "../../types.ts";
-import { getUserByPhone } from "../../utils/user.ts";
 import { Request, Response } from 'npm:@types/express@4.17.15';
 import { authAdminMiddleware } from '../../middlewares/auth-admin.ts';
 
@@ -21,16 +20,6 @@ adminReportRouter.get('/admin/reports', authAdminMiddleware, async (req: Request
   const userId = req.headers['x-user-id'] as string;
   const channelId = req.headers['x-channel'] as string;
   console.log(`[ADMIN_REPORT] Request received - UserId: ${userId}, ChannelId: ${channelId}`);
-
-  // Verify admin status
-  const userByChannel = await getUserByPhone(channelId);
-  const isAdmin = userByChannel?.id === userId;
-  console.log(`[ADMIN_REPORT] Admin verification - IsAdmin: ${isAdmin}`);
-
-  if (!isAdmin) {
-    console.log('[ADMIN_REPORT] Access denied - User is not an admin');
-    return res.status(403).json({ error: 'Admin access required' });
-  }
 
   // Extract and validate date parameters
   const { startDate, endDate } = req.query;
